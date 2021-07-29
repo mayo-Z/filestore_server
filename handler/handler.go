@@ -70,7 +70,7 @@ func UploadSucHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//通过文件hash获取文件meta信息
+//通过文件hash获取文件meta信息,暂时失效
 func FileQueryHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
