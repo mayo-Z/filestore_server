@@ -80,7 +80,8 @@ type User struct {
 func GetUserInfo(username string) (User, error) {
 	user := User{}
 	stmt, err := mydb.DBConn().Prepare(
-		"select user_name,signup_at from tbl_user where user_name=? limit 1 ")
+		"select user_name,signup_at from tbl_user " +
+			"where user_name=? limit 1 ")
 	if err != nil {
 		fmt.Println(err.Error())
 		return user, err
