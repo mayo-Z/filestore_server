@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	dblayer "filestore_server/db"
 	"filestore_server/meta"
+	"filestore_server/store/hdfs"
 	"filestore_server/util"
 	"fmt"
 	"io"
@@ -53,17 +54,23 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Failed to save data into file,err:", err.Error())
 			return
 		}
+		//读取上传的用户名
+		r.ParseForm()
+		username := r.Form.Get("username")
 
 		//newFile.Seek(0,0)的含义是将当前已打开的文件句柄的游标移到文件内容的顶部，
 		//这样读取文件内容时就从最开始的位置开始读写了．
 		newFile.Seek(0, 0)
 		fileMeta.FileSha1 = util.FileSha1(newFile)
+
+		//同时将文件写入hdfs存储
+		newFile.Seek(0, 0)
+		hdfsPath := "/filestore_server/" + username
+		hdfs.HdfsUploadFile(fileMeta.Location, hdfsPath, true)
+
 		//meta.UpdateFileMeta(fileMeta)
 		_ = meta.UpdateFileMetaDB(fileMeta)
-
 		//更新用户文件表记录
-		r.ParseForm()
-		username := r.Form.Get("username")
 		suc := dblayer.OnUserFileUploadFinished(username, fileMeta.FileSha1,
 			fileMeta.FileName, fileMeta.FileSize)
 		if suc {
