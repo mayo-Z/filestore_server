@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 )
 
-func HdfsUploadFile(localFile, hdfsPath string, overwrite bool) bool {
-	client := GetHdfsConnection()
+func UploadFile(localFile, hdfsPath string, overwrite bool) bool {
+	client := GetConnection()
 	//创建一个shell,可以使用下面shell进行操作
 	shell := gowfs.FsShell{FileSystem: client}
 	//本地路径，hdfs路径，是否重写
@@ -19,8 +19,8 @@ func HdfsUploadFile(localFile, hdfsPath string, overwrite bool) bool {
 	return true
 }
 
-func HdfsViewFile(hdfsPath string) bool {
-	client := GetHdfsConnection()
+func ViewFile(hdfsPath string) bool {
+	client := GetConnection()
 	path := gowfs.Path{Name: hdfsPath}
 	fsArr, err := client.ListStatus(path)
 	if err != nil {
@@ -54,8 +54,8 @@ func HdfsViewFile(hdfsPath string) bool {
 	return true
 }
 
-func HdfsReadFile(file string) bool {
-	client := GetHdfsConnection()
+func ReadFile(file string) bool {
+	client := GetConnection()
 	path := gowfs.Path{Name: file}
 	//接收如下参数：gowfs.Path,offset(偏移量),长度(显然是字节的长度), 容量(自己的cap)
 	//返回一个io.ReadCloser，这是需要实现io.Reader和io.Closer的接口
@@ -75,8 +75,8 @@ func HdfsReadFile(file string) bool {
 	return true
 }
 
-func HdfsDeleteFile(hdfsPath string, recursive bool) bool {
-	client := GetHdfsConnection()
+func DeleteFile(hdfsPath string, recursive bool) bool {
+	client := GetConnection()
 	path := gowfs.Path{Name: hdfsPath}
 	//路径，是否递归
 	flag, err := client.Delete(path, recursive)
@@ -87,8 +87,8 @@ func HdfsDeleteFile(hdfsPath string, recursive bool) bool {
 	return flag
 }
 
-func HdfsDownloadFile(hdfsPath, localFile string) bool {
-	client := GetHdfsConnection()
+func DownloadFile(hdfsPath, localFile string) bool {
+	client := GetConnection()
 	shell := gowfs.FsShell{FileSystem: client}
 
 	flag, err := shell.Get(hdfsPath, localFile)

@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	dblayer "filestore_server/db"
 	"filestore_server/meta"
-	"filestore_server/store/hdfs"
+	//"filestore_server/store/hdfs"
+	"filestore_server/store/oss"
 	"filestore_server/util"
 	"fmt"
 	"io"
@@ -64,9 +65,23 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		fileMeta.FileSha1 = util.FileSha1(newFile)
 
 		//同时将文件写入hdfs存储
+		/*
+			newFile.Seek(0, 0)
+			hdfsPath:="/filestore_server/" + username
+			hdfs.UploadFile(fileMeta.Location, hdfsPath, true)
+		*/
+
+		//同时将文件写入oss存储
 		newFile.Seek(0, 0)
-		hdfsPath := "/filestore_server/" + username
-		hdfs.HdfsUploadFile(fileMeta.Location, hdfsPath, true)
+		//ossPath:="oss/"+fileMeta.FileSha1+"_"+fileMeta.FileName
+		ossPath := "oss/" + fileMeta.FileSha1
+		oss.Bucket().PutObject(ossPath, newFile)
+		if err != nil {
+			fmt.Println(err.Error())
+			w.Write([]byte("Upload failed!"))
+			return
+		}
+		fileMeta.Location = ossPath
 
 		//meta.UpdateFileMeta(fileMeta)
 		_ = meta.UpdateFileMetaDB(fileMeta)
@@ -233,4 +248,17 @@ func TryFastUploadHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(resp.JSONBytes())
 		return
 	}
+}
+
+//DownloadURLHandler :生成文件的下载地址
+func DownloadURLHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	filehash := r.Form.Get("filehash")
+	//	从文件表查找记录
+	row, _ := dblayer.GetFileMeta(filehash)
+
+	//	TODO:判断文件存在oss还是hdfs
+
+	signedURL := oss.DownloadUrl(row.FileAddr.String)
+	w.Write([]byte(signedURL))
 }

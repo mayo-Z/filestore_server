@@ -7,7 +7,7 @@ import (
 
 //var client *gowfs.FileSystem
 
-func GetHdfsConnection() *gowfs.FileSystem {
+func GetConnection() *gowfs.FileSystem {
 	//这是配置，传入Addr: "ip: 9870", User: "随便写一个英文名就行"
 	addr := "127.0.0.1:9870"
 	user := "blackcat"
