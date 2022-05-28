@@ -16,7 +16,7 @@
 
 # 项目预览
 
-[![image.png](https://i.postimg.cc/d1R8YRxk/image.png)](https://postimg.cc/zbBLwh58)
+[![image.png](https://i.postimg.cc/2jW2TJFG/image.png)](https://postimg.cc/yWVm8LG3)
 
 # 代码运行
 
